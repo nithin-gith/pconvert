@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# PARAMS="$@"
+NUMBER="$#"
+if [ $NUMBER -eq 0 ]
+then
+    echo "Example Usage : "
+    echo "    pconvert file"
+    echo "    pconvert dir"
+    echo "NOTE : If no option is provided -re will be considered"
+    exit 1
+fi
+
+OPT=$@
+
+if [ $OPT == "file" ] ; then
+    echo "   1. Drag and drop the file"
+    echo "   2. Click Enter to convert"
+    read -s filedir 
+    basedir=$(dirname "$filedir")
+    cd $basedir
+    file=$(basename "$filedir")
+    echo ""
+    echo "   Conversion in progress..."
+    echo ""
+    if [ "${file##*.}" == "ppt" ] || [ "${file##*.}" == "pptx" ] || [ "${file##*.}" == "txt" ] || [ "${file##*.}" == "docx" ]
+    then
+        soffice --headless --convert-to pdf $file > /dev/null
+        echo "   pdf successfully saved."
+        echo ""
+        exit 1
+    fi
+    echo "   -------------------------------------------------------"
+    echo "   Conversion not successful."
+    echo "   1. Invalid file type"
+    echo "   2. Only .ppt/.pptx/.docx/.txt files are acceptable"
+    echo "   -------------------------------------------------------"
+fi
+ 
