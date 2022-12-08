@@ -22,7 +22,7 @@ pconvert dir
 ```
 3. You can also add the options to either replace the file or just add the created pdf file 
 
-To replace the existing ppt/txt file
+To replace the existing ppt/txt file with created pdf file
 ```
 pconvert -re file 
 ```
