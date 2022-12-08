@@ -1,0 +1,3 @@
+brew # for macos 
+apt # for ubuntu
+libreoffice

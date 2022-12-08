@@ -1,39 +1,113 @@
 #!/usr/bin/env bash
 
-# PARAMS="$@"
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
 NUMBER="$#"
+
 if [ $NUMBER -eq 0 ]
 then
     echo "Example Usage : "
-    echo "    pconvert file"
-    echo "    pconvert dir"
-    echo "NOTE : If no option is provided -re will be considered"
-    exit 1
+    echo "  pconvert -re file"
+    echo "  pconvert -n dir"
+    echo ""
+    echo "Options : "
+    echo " -re for replacing the existing file with pdf"
+    echo " -n for creating pdf without deleting the actual file"
+    echo ""
+    echo "NOTE : If no option is provided -n will be considered"
+    exit 0
 fi
 
-OPT=$@
+if [ $NUMBER -eq 1 ]; then  
+    TYP=$1
+    OPT="-n"
+elif [ $NUMBER -eq 2 ]; then
+    OPT=$1
+    TYP=$2
+fi
 
-if [ $OPT == "file" ] ; then
-    echo "   1. Drag and drop the file"
-    echo "   2. Click Enter to convert"
+
+if [ $TYP == "file" ] 
+then
+    printf "   ${YELLOW}1. Drag and drop the file${NC}\n"
+    printf "   ${YELLOW}2. Click Enter to convert${NC}\n"
     read -s filedir 
+        if [[ -d $filedir ]]; then
+        printf "   ${YELLOW}----------------------------------------------------------------${NC}\n"
+        printf "   ${YELLOW}This is a directory.${NC}\n"
+        printf "   ${YELLOW}Please use 'pconvert dir' command to convert files in directory${NC}\n"
+        printf "   ${YELLOW}----------------------------------------------------------------${NC}\n"
+        exit 0
+    fi
     basedir=$(dirname "$filedir")
     cd $basedir
     file=$(basename "$filedir")
     echo ""
     echo "   Conversion in progress..."
     echo ""
-    if [ "${file##*.}" == "ppt" ] || [ "${file##*.}" == "pptx" ] || [ "${file##*.}" == "txt" ] || [ "${file##*.}" == "docx" ]
+    if [ "${file##*.}" == "ppt" ] || [ "${file##*.}" == "pptx" ] || [ "${file##*.}" == "txt" ] 
     then
         soffice --headless --convert-to pdf $file > /dev/null
-        echo "   pdf successfully saved."
+        if [ $OPT == "-re" ];then 
+            rm $file
+        fi
+        printf "   ${GREEN}pdf successfully saved.${NC}\n"
         echo ""
-        exit 1
+        exit 0
     fi
+    printf "   -------------------------------------------------------\n"
+    printf "   ${RED}Conversion not successful.${NC}\n"
+    printf "   ${RED}1. Invalid file type${NC}\n"
+    printf "   ${RED}2. Only .ppt/.pptx/.txt files are acceptable${NC}\n"
+    printf "   -------------------------------------------------------\n"
+    exit 1
+elif [ $TYP == "dir" ]
+then
+    printf "   ${YELLOW}1. Drag and drop the directory${NC}\n"
+    printf "   ${YELLOW}2. Click Enter to convert${NC}\n"
+    read -s dir
+    if [[ -f $dir ]]; then
+        printf "   ------------------------------------------------------------\n"
+        printf "   ${RED}This is a file.${NC}\n"
+        printf "   ${RED}Please use 'pconvert file' command to convert a single file${NC}\n"
+        printf "   ------------------------------------------------------------\n"
+        exit 0
+    fi
+    cd $dir
+    TOT=0
+    for file in *
+    do 
+        if [ "${file##*.}" == "ppt" ] || [ "${file##*.}" == "pptx" ]
+        then 
+            (( TOT+=1 ))
+        fi
+    done
+    
+    if [ "$TOT" == "0" ]
+    then 
+        printf "   ${RED}No files found to convert.${NC}\n"
+        exit 0
+    fi
+
+    COMP=1
     echo "   -------------------------------------------------------"
-    echo "   Conversion not successful."
-    echo "   1. Invalid file type"
-    echo "   2. Only .ppt/.pptx/.docx/.txt files are acceptable"
+    for file in *
+    do 
+        if [ "${file##*.}" == "ppt" ] || [ "${file##*.}" == "pptx" ]
+        then 
+            soffice --headless --convert-to pdf $file > /dev/null
+            if [ $OPT == "-re" ];then 
+            rm $file
+            fi
+            printf "   ${YELLOW}converting $COMP / $TOT files.${NC}\n"
+            (( COMP+=1 ))
+        fi
+    done
+    printf "   ${GREEN}$TOT pdf files saved successfully.${NC}\n"
     echo "   -------------------------------------------------------"
+    exit 0
 fi
- 
+printf "${YELLOW}Please use 'pconvert' command to see manual.${NC}\n"
+exit 0
