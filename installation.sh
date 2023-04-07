@@ -12,8 +12,7 @@ fi
 
 chmod +x ./pconvert
 
-printf "${GREEN}----------------------------------------------------------------${NC}\n"
-printf "                  ${GREEN}Installation is complete${NC}\n"
-printf "          ${YELLOW}add the following line to your shell profile${NC}\n"
-printf "      ${YELLOW}alias pconvert=$PWD/pconvert${NC}\n"
-printf "${GREEN}----------------------------------------------------------------${NC}"
+echo alias pconvert=$PWD/pconvert >> .zshrc
+source ~/.zshrc
+echo alias pconvert=$PWD/pconvert >> .bashrc
+source ~/.bashrc

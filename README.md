@@ -8,7 +8,6 @@ git clone https://github.com/nithin-gith/pconvert.git
 cd pconvert
 sh installation.sh
 ```
-Then add the printed line (alias) to your shell profile
 
 ## Usage
 1. For manual use the pconvert command
